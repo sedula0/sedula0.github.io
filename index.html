@@ -3,228 +3,988 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Name | Creative Portfolio</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/ScrollTrigger.min.js"></script>
+    <title>Your Name - Portfolio</title>
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #0a0a0a;
-            color: #e2e2e2;
-            overflow-x: hidden;
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --primary: #2c1810;
+            --secondary: #8b7355;
+            --accent: #d4962b;
+            --background: #f7f3ef;
+            --surface: #faf8f5;
+            --border: #e8ddd1;
+            --hover: #f0ebe3;
         }
-        #bg-canvas {
+
+        [data-theme="dark"] {
+            --primary: #e8ddd1;
+            --secondary: #a8956e;
+            --accent: #f4c430;
+            --background: #1a1611;
+            --surface: #211d17;
+            --border: #3a342a;
+            --hover: #2a251c;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: var(--primary);
+            background: var(--background);
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        /* Smooth scrolling container */
+        .smooth-scroll {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: -1;
+            overflow: hidden;
+            pointer-events: none;
         }
-        .section {
-            min-height: 100vh;
+        
+        .smooth-scroll-content {
+            pointer-events: auto;
+        }
+        
+        /* Dark mode toggle */
+        .theme-toggle {
+            position: fixed;
+            top: 50%;
+            right: 2rem;
+            transform: translateY(-50%);
+            z-index: 1000;
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 50px;
+            padding: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .theme-toggle:hover {
+            transform: translateY(-50%) scale(1.05);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .theme-toggle-inner {
             display: flex;
-            flex-direction: column;
-            justify-content: center;
             align-items: center;
-            padding: 8rem 2rem;
-            position: relative; /* Needed for parallax */
-        }
-        .project-card {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .project-card:hover {
-            transform: scale(1.05);
-            box-shadow: 0 25px 50px -12px rgba(255, 255, 255, 0.1);
-        }
-        .nav-link {
+            gap: 0.5rem;
+            padding: 0.25rem;
+            background: var(--hover);
+            border-radius: 40px;
             position: relative;
+            width: 60px;
+            height: 30px;
+        }
+
+        .theme-toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 26px;
+            height: 26px;
+            background: var(--accent);
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+
+        [data-theme="dark"] .theme-toggle-slider {
+            transform: translateX(30px);
+        }
+
+        .theme-icon {
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+
+        .theme-toggle:hover .theme-icon {
+            opacity: 1;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--border);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--secondary);
+            border-radius: 3px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent);
+        }
+        
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(255, 214, 174, 0.88);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 0;
+            transform: translateY(-100%);
+            transition: background-color 0.3s ease;
+        }
+
+        [data-theme="dark"] header {
+            background: rgba(26, 22, 17, 0.9);
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-weight: 600;
+            font-size: 1.125rem;
+            color: var(--primary);
+            text-decoration: none;
             transition: color 0.3s ease;
         }
-        .nav-link::after {
+        
+        .logo:hover {
+            color: var(--accent);
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+        
+        .nav-links a {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 400;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+        
+        .nav-links a::after {
             content: '';
             position: absolute;
+            bottom: -4px;
+            left: 0;
             width: 0;
             height: 2px;
-            bottom: -5px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: #e2e2e2;
+            background: var(--accent);
             transition: width 0.3s ease;
         }
-        .nav-link:hover::after {
+        
+        .nav-links a:hover::after {
             width: 100%;
+        }
+        
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--background) 0%, var(--surface) 100%);
+            z-index: -1;
+        }
+        
+        .hero-content {
+            opacity: 0;
+            transform: translateY(60px);
+        }
+        
+        .hero-title {
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+            overflow: hidden;
+        }
+        
+        .hero-title span {
+            display: inline-block;
+            transform: translateY(100%);
+        }
+        
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--secondary);
+            margin-bottom: 2rem;
+            max-width: 600px;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        
+        .cta-button {
+            display: inline-block;
+            padding: 0.75rem 2rem;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: 2px solid var(--primary);
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        
+        .cta-button:hover {
+            background: transparent;
+            color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Section Styling */
+        .section {
+            padding: 6rem 0;
+            position: relative;
+        }
+        
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin-bottom: 3rem;
+            text-align: center;
+            letter-spacing: -0.01em;
+            opacity: 0;
+            transform: translateY(50px);
+        }
+        
+        /* Sticky section number */
+        .section-number {
+            position: sticky;
+            top: 50%;
+            left: 2rem;
+            font-size: 8rem;
+            font-weight: 700;
+            color: rgba(236, 135, 28, 0.864);
+            z-index: 1;
+            pointer-events: none;
+            transform: translateY(-50%);
+            transition: color 0.3s ease;
+        }
+
+        [data-theme="dark"] .section-number {
+            color: rgba(244, 196, 48, 0.08);
+        }
+        
+        /* About Section */
+        .about {
+            background: var(--surface);
+            position: relative;
+            transition: background-color 0.3s ease;
+        }
+        
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            opacity: 0;
+            transform: translateY(50px);
+        }
+        
+        .about-text {
+            font-size: 1.1rem;
+            color: var(--secondary);
+            margin-bottom: 2rem;
+        }
+        
+        .skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .skill-tag {
+            padding: 0.5rem 1rem;
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: var(--secondary);
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        
+        .skill-tag:hover {
+            background: var(--accent);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        /* Projects Section */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+        
+        .project-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(50px);
+        }
+        
+        .project-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .project-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, var(--accent), #e6a532);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .project-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s ease;
+        }
+        
+        .project-card:hover .project-image::before {
+            left: 100%;
+        }
+        
+        .project-content {
+            padding: 1.5rem;
+        }
+        
+        .project-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .project-description {
+            color: var(--secondary);
+            margin-bottom: 1rem;
+        }
+        
+        .project-link {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+        
+        .project-link:hover {
+            color: var(--primary);
+        }
+        
+        /* Links Section */
+        .links {
+            background: var(--surface);
+            transition: background-color 0.3s ease;
+        }
+        
+        .links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+        
+        .link-card {
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: var(--primary);
+            opacity: 0;
+            transform: translateY(50px);
+        }
+        
+        .link-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+            color: var(--primary);
+        }
+        
+        .link-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+        }
+        
+        .link-card:hover .link-icon {
+            transform: scale(1);
+        }
+        
+        .link-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .link-description {
+            color: var(--secondary);
+            font-size: 0.9rem;
+        }
+        
+        /* Contact Section */
+        .contact-content {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+            opacity: 0;
+            transform: translateY(50px);
+        }
+        
+        .contact-text {
+            font-size: 1.1rem;
+            color: var(--secondary);
+            margin-bottom: 2rem;
+        }
+        
+        .contact-info {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .contact-item {
+            color: var(--secondary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+        }
+        
+        .contact-item:hover {
+            color: var(--accent);
+            background: var(--hover);
+            transform: translateY(-2px);
+        }
+        
+        /* Footer */
+        footer {
+            background: var(--primary);
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 4rem;
+        }
+        
+        /* Progress indicator */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: var(--accent);
+            z-index: 1000;
+            transform-origin: left;
+            transform: scaleX(0);
+        }
+        
+        /* Parallax elements */
+        .parallax-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 120%;
+            background: linear-gradient(135deg, var(--background) 0%, var(--surface) 100%);
+            z-index: -1;
+            transition: background-color 0.3s ease;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .about-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .contact-info {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .section-number {
+                display: none;
+            }
+        }
+        
+        /* Scroll behavior */
+        html {
+            scroll-behavior: smooth;
         }
     </style>
 </head>
-<body class="antialiased">
-    <canvas id="bg-canvas"></canvas>
-
-    <header class="fixed top-0 left-0 right-0 z-50 p-8 flex justify-between items-center">
-        <div class="text-2xl font-bold tracking-wider">LOGO</div>
-        <nav>
-            <ul class="flex space-x-8 text-lg">
-                <li><a href="#about" class="nav-link">About</a></li>
-                <li><a href="#projects" class="nav-link">Projects</a></li>
-                <li><a href="https://quartz.sedula.space" class="nav-link">Digital Garden</a></li>
-                <li><a href="#contact" class="nav-link">Contact</a></li>
+<body>
+    <div class="progress-bar"></div>
+    
+    <div class="theme-toggle" onclick="toggleTheme()">
+        <div class="theme-toggle-inner">
+            <div class="theme-toggle-slider">
+                <span class="theme-icon">🌙</span>
+            </div>
+        </div>
+    </div>
+    
+    <header>
+        <nav class="container">
+            <a href="#" class="logo">Your Name</a>
+            <ul class="nav-links">
+                <li><a href="#about">About</a></li>
+                <li><a href="#projects">Projects</a></li>
+                <li><a href="https://quartz.sedula.space" target="_blank">Garden</a></li>
+                <li><a href="#contact">Contact</a></li>
             </ul>
         </nav>
     </header>
 
     <main>
-        <section id="hero" class="section text-center">
-            <h1 class="text-6xl md:text-8xl font-bold leading-tight mb-4">Creative Developer</h1>
-            <p class="text-xl md:text-2xl text-gray-400 max-w-3xl">I design and build beautiful, interactive, and user-friendly digital experiences. Based in [Your City].</p>
-        </section>
-
-        <section id="about" class="section">
-            <div class="grid md:grid-cols-2 gap-16 items-center max-w-6xl mx-auto">
-                <div>
-                    <img src="https://placehold.co/600x800/1a1a1a/e2e2e2?text=Your+Image" alt="Your Name" class="rounded-lg shadow-2xl">
-                </div>
-                <div>
-                    <h2 class="text-4xl font-bold mb-6">About Me</h2>
-                    <p class="text-lg text-gray-300 mb-4">
-                        I'm a passionate and results-oriented creative developer with a knack for turning complex problems into elegant, intuitive solutions. With over [X] years of experience in the industry, I've had the privilege of working on a diverse range of projects for clients big and small.
-                    </p>
-                    <p class="text-lg text-gray-300">
-                        My expertise lies in front-end development, with a strong focus on modern JavaScript frameworks, responsive design, and creating engaging user experiences. I'm always eager to learn new technologies and push the boundaries of what's possible on the web.
-                    </p>
+        <section class="hero">
+            <div class="hero-background"></div>
+            <div class="container">
+                <div class="hero-content">
+                    <h1 class="hero-title">
+                        <span>Creative</span> <span>Developer</span> <span>&</span> <span>Designer</span>
+                    </h1>
+                    <p class="hero-subtitle">I craft digital experiences that merge aesthetic beauty with functional excellence, bringing ideas to life through code and design.</p>
+                    <a href="#projects" class="cta-button">View My Work</a>
                 </div>
             </div>
         </section>
 
-        <section id="projects" class="section">
-            <h2 class="text-4xl font-bold mb-12 text-center">Featured Projects</h2>
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-                <!-- Project Card 1 -->
-                <div class="bg-gray-900 rounded-lg overflow-hidden project-card">
-                    <img src="https://placehold.co/600x400/1a1a1a/e2e2e2?text=Project+1" alt="Project 1" class="w-full h-64 object-cover">
-                    <div class="p-6">
-                        <h3 class="text-2xl font-bold mb-2">Project Title 1</h3>
-                        <p class="text-gray-400">A brief, compelling description of the project and its goals.</p>
+        <section id="about" class="section about">
+            <div class="parallax-bg"></div>
+            <div class="section-number">01</div>
+            <div class="container">
+                <h2 class="section-title">About Me</h2>
+                <div class="about-content">
+                    <div>
+                        <p class="about-text">I'm a passionate developer and designer with a love for creating meaningful digital experiences. My work spans across web development, user interface design, and creative problem-solving.</p>
+                        <p class="about-text">When I'm not coding, you'll find me exploring new technologies, contributing to open-source projects, or documenting my learnings in my digital garden.</p>
                     </div>
-                </div>
-                <!-- Project Card 2 -->
-                <div class="bg-gray-900 rounded-lg overflow-hidden project-card">
-                    <img src="https://placehold.co/600x400/1a1a1a/e2e2e2?text=Project+2" alt="Project 2" class="w-full h-64 object-cover">
-                    <div class="p-6">
-                        <h3 class="text-2xl font-bold mb-2">Project Title 2</h3>
-                        <p class="text-gray-400">A brief, compelling description of the project and its goals.</p>
-                    </div>
-                </div>
-                <!-- Project Card 3 -->
-                <div class="bg-gray-900 rounded-lg overflow-hidden project-card">
-                    <img src="https://placehold.co/600x400/1a1a1a/e2e2e2?text=Project+3" alt="Project 3" class="w-full h-64 object-cover">
-                    <div class="p-6">
-                        <h3 class="text-2xl font-bold mb-2">Project Title 3</h3>
-                        <p class="text-gray-400">A brief, compelling description of the project and its goals.</p>
+                    <div>
+                        <h3 style="margin-bottom: 1rem; font-weight: 600;">Skills & Technologies</h3>
+                        <div class="skills">
+                            <span class="skill-tag">JavaScript</span>
+                            <span class="skill-tag">React</span>
+                            <span class="skill-tag">Node.js</span>
+                            <span class="skill-tag">Python</span>
+                            <span class="skill-tag">TypeScript</span>
+                            <span class="skill-tag">CSS</span>
+                            <span class="skill-tag">Design Systems</span>
+                            <span class="skill-tag">UI/UX</span>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section id="contact" class="section">
-            <div class="text-center max-w-2xl mx-auto">
-                <h2 class="text-4xl font-bold mb-6">Get In Touch</h2>
-                <p class="text-lg text-gray-300 mb-8">I'm currently available for freelance work and open to discussing new projects. Feel free to reach out!</p>
-                <a href="mailto:your.email@example.com" class="bg-white text-black font-bold py-4 px-8 rounded-full text-lg hover:bg-gray-300 transition-colors">
-                    your.email@example.com
-                </a>
+        <section id="projects" class="section projects">
+            <div class="section-number">02</div>
+            <div class="container">
+                <h2 class="section-title">Featured Projects</h2>
+                <div class="projects-grid">
+                    <div class="project-card">
+                        <div class="project-image">Project One</div>
+                        <div class="project-content">
+                            <h3 class="project-title">Modern Web Application</h3>
+                            <p class="project-description">A full-stack web application built with React and Node.js, featuring real-time data visualization and user authentication.</p>
+                            <a href="#" class="project-link">View Project →</a>
+                        </div>
+                    </div>
+                    <div class="project-card">
+                        <div class="project-image">Project Two</div>
+                        <div class="project-content">
+                            <h3 class="project-title">Design System</h3>
+                            <p class="project-description">A comprehensive design system with reusable components, documentation, and guidelines for consistent user experiences.</p>
+                            <a href="#" class="project-link">View Project →</a>
+                        </div>
+                    </div>
+                    <div class="project-card">
+                        <div class="project-image">Project Three</div>
+                        <div class="project-content">
+                            <h3 class="project-title">Mobile App Interface</h3>
+                            <p class="project-description">Clean and intuitive mobile app design with focus on user experience and accessibility across different devices.</p>
+                            <a href="#" class="project-link">View Project →</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="links" class="section links">
+            <div class="parallax-bg"></div>
+            <div class="section-number">03</div>
+            <div class="container">
+                <h2 class="section-title">Explore More</h2>
+                <div class="links-grid">
+                    <a href="Sahith_Resume.pdf" target="_blank" rel="noopener" class="link-card">
+                        <div class="link-icon">📄</div>
+                        <h3 class="link-title">Resume</h3>
+                        <p class="link-description">Download my one-page resume</p>
+                    </a>
+                    <a href="#" class="link-card">
+                        <div class="link-icon">📄</div>
+                        <h3 class="link-title">CV</h3>
+                        <p class="link-description">Download my full CV (coming soon)</p>
+                    </a>
+                    <a href="https://www.linkedin.com/in/sedula/" target="_blank" class="link-card">
+                        <div class="link-icon">💼</div>
+                        <h3 class="link-title">LinkedIn</h3>
+                        <p class="link-description">Connect with me professionally and see my career journey</p>
+                    </a>
+                    <a href="https://github.com/sedula0" target="_blank" class="link-card">
+                        <div class="link-icon">🔗</div>
+                        <h3 class="link-title">GitHub</h3>
+                        <p class="link-description">Browse my code repositories and open-source contributions</p>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="section contact">
+            <div class="section-number">04</div>
+            <div class="container">
+                <h2 class="section-title">Get In Touch</h2>
+                <div class="contact-content">
+                    <p class="contact-text">I'm always interested in hearing about new opportunities and creative projects. Let's connect and create something amazing together.</p>
+                    <div class="contact-info">
+                        <a href="mailto:sahith.applications@gmail.com" class="contact-item">sahith.applications@gmail.com</a>
+                        <a href="tel:+19253074864" class="contact-item">(925) 307-4864</a>
+                    </div>
+                </div>
             </div>
         </section>
     </main>
 
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Sahith Edula.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <script>
-        // Three.js background animation
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas'), alpha: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-
-        const geometry = new THREE.BufferGeometry();
-        const vertices = [];
-        for (let i = 0; i < 10000; i++) {
-            vertices.push(THREE.MathUtils.randFloatSpread(2000)); // x
-            vertices.push(THREE.MathUtils.randFloatSpread(2000)); // y
-            vertices.push(THREE.MathUtils.randFloatSpread(2000)); // z
-        }
-        geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-        const particles = new THREE.Points(geometry, new THREE.PointsMaterial({ color: 0x888888, size: 0.7 }));
-        scene.add(particles);
-
-        camera.position.z = 5;
-
-        // Animate function for Three.js
-        function animate() {
-            requestAnimationFrame(animate);
-            particles.rotation.x += 0.0001;
-            particles.rotation.y += 0.0002;
-            renderer.render(scene, camera);
-        }
-        animate();
-
-        // Handle window resize
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-
-        // --- GSAP Animations ---
+        // Register ScrollTrigger plugin
         gsap.registerPlugin(ScrollTrigger);
-
-        // Hero section intro animation
-        gsap.from('#hero h1', { duration: 1, y: 50, opacity: 0, delay: 0.5, ease: 'power3.out' });
-        gsap.from('#hero p', { duration: 1, y: 50, opacity: 0, delay: 0.8, ease: 'power3.out' });
         
-        // Initial fade-in for sections
-        gsap.utils.toArray('.section').forEach((section, i) => {
-            if (i > 0) { // Skip hero section
-                gsap.from(section, {
-                    scrollTrigger: {
-                        trigger: section,
-                        start: 'top 80%',
-                        toggleActions: 'play none none reverse'
-                    },
-                    opacity: 0,
-                    y: 100,
-                    duration: 1,
-                    ease: 'power3.out'
-                });
-            }
+        // Theme toggle functionality
+        function toggleTheme() {
+            const body = document.body;
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            body.setAttribute('data-theme', newTheme);
+            
+            // Update toggle icon
+            const themeIcon = document.querySelector('.theme-icon');
+            themeIcon.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+            
+            // Animate the toggle
+            gsap.to('.theme-toggle', {
+                scale: 0.95,
+                duration: 0.1,
+                yoyo: true,
+                repeat: 1,
+                ease: "power2.inOut"
+            });
+            
+            // Store theme preference
+            localStorage.setItem('theme', newTheme);
+        }
+        
+        // Initialize theme
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            const body = document.body;
+            const themeIcon = document.querySelector('.theme-icon');
+            
+            body.setAttribute('data-theme', savedTheme);
+            themeIcon.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+        }
+        
+        // Initialize theme on load
+        initTheme();
+        
+        // Initial setup
+        gsap.set(".hero-title span", { y: "100%" });
+        gsap.set(".hero-subtitle", { y: 30, opacity: 0 });
+        gsap.set(".cta-button", { y: 30, opacity: 0 });
+        
+        // Header animation
+        gsap.to("header", {
+            y: 0,
+            duration: 1,
+            ease: "power2.out",
+            delay: 0.5
         });
-
-        // Parallax effect for content sections
-        gsap.utils.toArray('.section').forEach((section, i) => {
-            if (i > 0) { // Skip hero section
-                gsap.to(section, {
-                    scrollTrigger: {
-                        trigger: section,
-                        start: "top bottom", // when the top of the trigger hits the bottom of the viewport
-                        end: "bottom top", // when the bottom of the trigger hits the top of the viewport
-                        scrub: true
-                    },
-                    yPercent: -20 // Move section up 20% of its height as it scrolls
-                });
-            }
-        });
-
-        // Parallax effect for the 3D background
-        gsap.to(camera.position, {
-            z: 1, // Zoom in closer
+        
+        // Hero animations
+        const heroTl = gsap.timeline();
+        heroTl.to(".hero-title span", {
+            y: 0,
+            duration: 1,
+            stagger: 0.1,
+            ease: "power2.out",
+            delay: 0.8
+        })
+        .to(".hero-subtitle", {
+            y: 0,
+            opacity: 1,
+            duration: 0.8,
+            ease: "power2.out"
+        }, "-=0.3")
+        .to(".cta-button", {
+            y: 0,
+            opacity: 1,
+            duration: 0.8,
+            ease: "power2.out"
+        }, "-=0.5");
+        
+        // Progress bar
+        gsap.to(".progress-bar", {
+            scaleX: 1,
+            transformOrigin: "left",
+            ease: "none",
             scrollTrigger: {
                 trigger: "body",
                 start: "top top",
                 end: "bottom bottom",
-                scrub: 1 // Smoothly scrub the animation
+                scrub: true
             }
         });
-
+        
+        // Parallax backgrounds
+        gsap.to(".hero-background", {
+            y: -100,
+            ease: "none",
+            scrollTrigger: {
+                trigger: ".hero",
+                start: "top top",
+                end: "bottom top",
+                scrub: true
+            }
+        });
+        
+        gsap.utils.toArray(".parallax-bg").forEach(bg => {
+            gsap.to(bg, {
+                y: -50,
+                ease: "none",
+                scrollTrigger: {
+                    trigger: bg.parentElement,
+                    start: "top bottom",
+                    end: "bottom top",
+                    scrub: true
+                }
+            });
+        });
+        
+        // Section animations
+        gsap.utils.toArray(".section-title").forEach(title => {
+            gsap.to(title, {
+                y: 0,
+                opacity: 1,
+                duration: 1,
+                ease: "power2.out",
+                scrollTrigger: {
+                    trigger: title,
+                    start: "top 80%",
+                    end: "bottom 20%",
+                    toggleActions: "play none none reverse"
+                }
+            });
+        });
+        
+        // About section
+        gsap.to(".about-content", {
+            y: 0,
+            opacity: 1,
+            duration: 1,
+            ease: "power2.out",
+            scrollTrigger: {
+                trigger: ".about-content",
+                start: "top 80%",
+                end: "bottom 20%",
+                toggleActions: "play none none reverse"
+            }
+        });
+        
+        // Skill tags animation
+        gsap.to(".skill-tag", {
+            y: 0,
+            opacity: 1,
+            duration: 0.6,
+            stagger: 0.1,
+            ease: "power2.out",
+            scrollTrigger: {
+                trigger: ".skills",
+                start: "top 80%",
+                end: "bottom 20%",
+                toggleActions: "play none none reverse"
+            }
+        });
+        
+        // Project cards
+        gsap.utils.toArray(".project-card").forEach(card => {
+            gsap.to(card, {
+                y: 0,
+                opacity: 1,
+                duration: 0.8,
+                ease: "power2.out",
+                scrollTrigger: {
+                    trigger: card,
+                    start: "top 80%",
+                    end: "bottom 20%",
+                    toggleActions: "play none none reverse"
+                }
+            });
+        });
+        
+        // Link cards
+        gsap.utils.toArray(".link-card").forEach(card => {
+            gsap.to(card, {
+                y: 0,
+                opacity: 1,
+                duration: 0.8,
+                ease: "power2.out",
+                scrollTrigger: {
+                    trigger: card,
+                    start: "top 80%",
+                    end: "bottom 20%",
+                    toggleActions: "play none none reverse"
+                }
+            });
+        });
+        
+        // Contact section
+        gsap.to(".contact-content", {
+            y: 0,
+            opacity: 1,
+            duration: 1,
+            ease: "power2.out",
+            scrollTrigger: {
+                trigger: ".contact-content",
+                start: "top 80%",
+                end: "bottom 20%",
+                toggleActions: "play none none reverse"
+            }
+        });
+        
+        // Section numbers parallax
+        gsap.utils.toArray(".section-number").forEach(number => {
+            gsap.to(number, {
+                y: -100,
+                ease: "none",
+                scrollTrigger: {
+                    trigger: number.parentElement,
+                    start: "top bottom",
+                    end: "bottom top",
+                    scrub: true
+                }
+            });
+        });
+        
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    gsap.to(window, {
+                        duration: 1.5,
+                        scrollTo: {
+                            y: target,
+                            offsetY: 80
+                        },
+                        ease: "power2.inOut"
+                    });
+                }
+            });
+        });
+        
+        // Refresh ScrollTrigger on window resize
+        window.addEventListener('resize', () => {
+            ScrollTrigger.refresh();
+        });
     </script>
 </body>
 </html>
